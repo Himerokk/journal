@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал Группы</title>
+    <style>
+        :root {
+            --bg-dark: #030305;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.12);
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: #fff; margin: 0; padding: 20px;
+            overflow-x: hidden; width: 100%; box-sizing: border-box;
+        }
+
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(30px);
+            border-radius: 24px; border: 1px solid var(--border);
+            overflow: hidden; margin-top: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
+
+        /* Стили для отрисовки данных через JS */
+        .loading { text-align: center; padding: 50px; font-weight: 900; color: var(--accent-cyan); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="logo-main">ЖУРНАЛ</h1>
+        <span class="group-number">ГРУППА 123</span>
+    </div>
+
+    <div class="glass-card" id="main-content">
+        <div class="loading">ЗАГРУЗКА ДАННЫХ С СЕРВЕРА...</div>
+    </div>
+</div>
+
+<script>
+    // ЗАМЕНИ НА СВОЙ URL ИЗ PYTHONANYWHERE
+    const API_URL = 'https://Himer.pythonanywhere.com/api/students/';
+
+    async function loadStudents() {
+        const content = document.getElementById('main-content');
+        try {
+            const response = await fetch(API_URL);
+            const students = await response.json();
+
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>СТУДЕНТ</th>
+                        <th>СТАТУС</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            students.forEach(s => {
+                html += `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td><span class="status-pill present">В СЕТИ</span></td>
+                    </tr>`;
+            });
+
+            html += `</tbody></table>`;
+            content.innerHTML = html;
+
+        } catch (error) {
+            content.innerHTML = `<div class="loading" style="color: var(--accent-pink)">
+                ОШИБКА ДОСТУПА К СЕРВЕРУ. ВКЛЮЧИТЕ VPN (ТОЛЬКО ДЛЯ ПЕРВОГО ЗАПУСКА) ИЛИ ПРОВЕРЬТЕ CORS.
+            </div>`;
+        }
+    }
+
+    loadStudents();
+</script>
+</body>
+</html>
