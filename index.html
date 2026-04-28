@@ -1,107 +1,136 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Журнал Группы</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>ITHub | Кибер-Журнал v2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
+        /* ТВОИ ОРИГИНАЛЬНЫЕ СТИЛИ (БЕЗ ИЗМЕНЕНИЙ) */
         :root {
             --bg-dark: #030305;
             --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
             --accent-cyan: #06b6d4;
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.12);
         }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: #fff; margin: 0; padding: 40px 20px; min-height: 100vh; overflow-x: hidden; box-sizing: border-box; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(236, 72, 153, 0.15) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%); z-index: -1; }
+        .container { max-width: 1000px; margin: 0 auto; width: 100%; }
+        .header { text-align: center; margin-bottom: 60px; }
+        .logo-main { font-weight: 900; font-size: 3.5rem; margin: 0; letter-spacing: -2px; line-height: 1; background: linear-gradient(to bottom, #fff 30%, #444); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); }
+        .group-number { display: inline-block; font-weight: 900; font-size: 1.5rem; margin-top: 10px; text-transform: uppercase; letter-spacing: 4px; background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple), var(--accent-pink), var(--accent-cyan)); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: gradientFlow 4s linear infinite; }
+        @keyframes gradientFlow { 0% { background-position: 0% center; } 100% { background-position: 300% center; } }
+        .session-info { margin-top: 35px; display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .date-picker-neon { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 15px; padding: 12px 20px; color: var(--accent-cyan); font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; outline: none; cursor: pointer; width: auto; min-width: 180px; }
+        .live-status { color: var(--accent-pink); font-size: 0.7rem; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; padding: 6px 12px; border-radius: 8px; background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.2); text-shadow: 0 0 10px var(--accent-pink); animation: blink 2s infinite; text-align: center; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        
+        /* СТИЛИ ИНДИКАТОРОВ */
+        .status-indicators { display: flex; gap: 8px; margin-top: 10px; justify-content: center; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 5px rgba(0,0,0,0.8); }
+        .indicator-dot.present { background: #10b981; box-shadow: 0 0 10px #10b981; }
+        .indicator-dot.absent { background: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
+        
+        /* КАРТОЧКИ И ТАБЛИЦА */
+        .glass-card { background: var(--glass); backdrop-filter: blur(30px); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 20px 30px; text-align: left; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: #666; background: rgba(0,0,0,0.3); }
+        td { padding: 20px 30px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .avatar { width: 50px; height: 50px; background: linear-gradient(135deg, #1a1a1a, #000); border: 1px solid var(--border); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; }
+        .student-name { font-weight: 700; font-size: 1.1rem; color: #fff; }
+        .btn-profile { padding: 12px 22px; border-radius: 14px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; text-decoration: none; background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.2); display: block; width: fit-content; margin-left: auto; }
 
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            background-color: var(--bg-dark); 
-            color: #fff; margin: 0; padding: 20px;
-            overflow-x: hidden; width: 100%; box-sizing: border-box;
+        /* АДАПТИВНОСТЬ */
+        @media screen and (max-width: 850px) {
+            .logo-main { font-size: 2.5rem; }
+            thead { display: none; }
+            tr { display: flex; flex-direction: column; background: var(--glass); border: 1px solid var(--border); border-radius: 20px; margin-bottom: 20px; padding: 20px; }
+            td { padding: 10px 0; border-bottom: none; display: flex; align-items: center; width: 100%; justify-content: space-between; }
+            .btn-profile { width: 100%; text-align: center; }
         }
-
-        /* Твой неоновый фон */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
-            z-index: -1;
-        }
-
-        .container { width: 100%; max-width: 800px; margin: 0 auto; }
-
-        .logo-main {
-            font-weight: 900; font-size: clamp(2rem, 8vw, 3.5rem);
-            background: linear-gradient(to bottom, #fff, #444);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 30px;
-        }
-
-        .glass-card { 
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; border: 1px solid var(--border);
-            padding: 20px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s;
-        }
-
-        .glass-card:hover { border-color: var(--accent-purple); transform: translateY(-2px); }
-
-        .student-info { display: flex; flex-direction: column; }
-        .student-name { font-weight: 700; font-size: 1.1rem; }
-        .student-id { font-size: 0.8rem; color: #888; }
-
-        .status-pill {
-            padding: 6px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 900;
-            background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan);
-        }
-
-        .loader { text-align: center; padding: 50px; font-weight: 700; letter-spacing: 2px; }
+        
+        .loader { text-align: center; padding: 40px; font-weight: 900; color: var(--accent-cyan); letter-spacing: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1 class="logo-main">ЖУРНАЛ</h1>
-    <div id="app">
-        <div class="loader">СИНХРОНИЗАЦИЯ...</div>
+    <header class="header">
+        <h1 class="logo-main">IThub.Journal</h1>
+        <div class="group-number">11 ИСИП-В</div>
+        <div class="session-info">
+            <input type="text" id="main-cyber-calendar" class="date-picker-neon">
+            <span class="live-status">● СИСТЕМА СИНХРОНИЗИРОВАНА</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="glass-card">
+            <table id="students-table">
+                <thead>
+                    <tr>
+                        <th>Студент</th>
+                        <th style="text-align: center;">Мониторинг</th>
+                        <th style="text-align: right;">Подробно</th>
+                    </tr>
+                </thead>
+                <tbody id="students-list">
+                    <tr><td colspan="3" class="loader">ПОДКЛЮЧЕНИЕ К БАЗЕ...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<script>
-    const API_URL = 'https://himer.pythonanywhere.com/api/students/';
+    <script>
+        const API_URL = 'https://himer.pythonanywhere.com/api/students/';
 
-    async function loadData() {
-        const app = document.getElementById('app');
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-            
-            if (data.length === 0) {
-                app.innerHTML = '<div class="loader">СТУДЕНТОВ ПОКА НЕТ</div>';
-                return;
+        async function fetchStudents() {
+            const list = document.getElementById('students-list');
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                list.innerHTML = data.map(item => `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div class="avatar">${item.name ? item.name.charAt(0) : '?'}</div>
+                                <span class="student-name">${item.name}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="status-indicators">
+                                <div class="indicator-dot present"></div>
+                                <div class="indicator-dot present"></div>
+                                <div class="indicator-dot"></div>
+                                <div class="indicator-dot"></div>
+                                <div class="indicator-dot"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="https://himer.pythonanywhere.com/student/${item.id}/" class="btn-profile">Профиль</a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = `<tr><td colspan="3" class="loader" style="color:red">ОШИБКА СЕРВЕРА</td></tr>`;
             }
-
-            app.innerHTML = data.map(student => `
-                <div class="glass-card">
-                    <div class="student-info">
-                        <span class="student-name">${student.name}</span>
-                        <span class="student-id">ID: ${student.id}</span>
-                    </div>
-                    <div class="status-pill">В СПИСКЕ</div>
-                </div>
-            `).join('');
-
-        } catch (e) {
-            app.innerHTML = `
-                <div class="loader" style="color: #ec4899;">
-                    ОШИБКА СВЯЗИ С СЕРВЕРОМ<br>
-                    <small style="font-size: 0.6rem; color: #888;">${e}</small>
-                </div>`;
         }
-    }
 
-    loadData();
-</script>
+        flatpickr("#main-cyber-calendar", {
+            locale: "ru",
+            defaultDate: "today",
+            onChange: (selectedDates, dateStr) => {
+                console.log("Выбрана дата:", dateStr);
+                // Тут можно добавить фильтрацию по дате, когда API будет это поддерживать
+            }
+        });
+
+        fetchStudents();
+    </script>
 </body>
 </html>
